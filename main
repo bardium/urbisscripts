@@ -1,0 +1,16 @@
+local themes = {
+	Background = Color3.fromRGB(128, 200, 128), 
+	Glow = Color3.fromRGB(128, 200, 128), 
+	Accent = Color3.fromRGB(70, 120, 70), 
+	LightContrast = Color3.fromRGB(108, 180, 108), 
+	DarkContrast = Color3.fromRGB(88, 140, 88),  
+	TextColor = Color3.fromRGB(200, 255, 200)
+}
+
+if game.CoreGui:FindFirstChild("Fantastic Frontier Hub") then
+	game.CoreGui:FindFirstChild("Fantastic Frontier Hub (Goose Better#9356)"):Destroy()
+end
+
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bardium/venyx/main/main"))()
+
+local venyx = library.new("Urbis Hub (Goose Better#9356)", 5013109572)
