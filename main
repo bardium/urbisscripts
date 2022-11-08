@@ -41,6 +41,9 @@ abilitiesSection:addToggle("Auto Chest Farm", false, function(value)
 	end
 end)
 
+
+abilitiesSection:addText("WARNING: Spamming Spawn NPCS will result in lag to the script and server.")
+
 local spamSpawnNPCs = false
 abilitiesSection:addToggle("Spam Spawn NPCs", false, function(value)
 	if value == true then
