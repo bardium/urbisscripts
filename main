@@ -7,10 +7,181 @@ local themes = {
 	TextColor = Color3.fromRGB(200, 255, 200)
 }
 
-if game.CoreGui:FindFirstChild("Fantastic Frontier Hub") then
-	game.CoreGui:FindFirstChild("Fantastic Frontier Hub (Goose Better#9356)"):Destroy()
+if game.CoreGui:FindFirstChild("Urbis Hub (Goose Better#9356)") then
+	game.CoreGui:FindFirstChild("Urbis Hub (Goose Better#9356)"):Destroy()
 end
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bardium/venyx/main/main"))()
 
 local venyx = library.new("Urbis Hub (Goose Better#9356)", 5013109572)
+
+local mainPage = venyx:addPage("Features", 5012544092)
+local itemIdsPage = venyx:addPage("Item Ids", 5012537936)
+for index, folder in ipairs(game:GetService("ReplicatedStorage").ItemDirectory:GetChildren()) do
+	task.wait()
+	local folderSection = itemIdsPage:addSection(folder.Name)
+	for index, item in ipairs(folder:GetChildren()) do
+		task.wait()
+		folderSection:addText(item.Name..", Item ID: "..tostring(item:FindFirstChild("ItemID").Value)..", Actual Price: "..tostring(item:FindFirstChild("Price",true).Value))
+	end
+end
+
+local abilitiesSection = mainPage:addSection("Abilities")
+
+abilitiesSection:addText("You may have to complete the tutorial first to use the script.")
+
+local autoChestFarm = false
+abilitiesSection:addToggle("Auto Chest Farm", false, function(value)
+	if value == true then
+		autoChestFarm = true
+		venyx:Notify("Status","Auto Chest Farm enabled.","rbxassetid://716467140")
+	else
+		autoChestFarm = false
+		venyx:Notify("Status","Auto Chest Farm disabled.","rbxassetid://716467140")
+	end
+end)
+
+local spamSpawnNPCs = false
+abilitiesSection:addToggle("Spam Spawn NPCs", false, function(value)
+	if value == true then
+		spamSpawnNPCs = true
+		venyx:Notify("Status","Spam Spawn enabled.","rbxassetid://1620858521")
+	else
+		spamSpawnNPCs = false
+		venyx:Notify("Status","Spam Spawn disabled.","rbxassetid://1620858521")
+	end
+end)
+
+local idOfItemToSpawn = nil
+abilitiesSection:addTextbox("Item To Spawn Id", "Insert Item To Spawn's Id Here", function(value,focusLost)
+	if focusLost then
+		if value ~= nil and value ~= "" and tonumber(value) ~= nil then
+			venyx:Notify("Status","Item ID accepted.","rbxassetid://498428442")
+			idOfItemToSpawn = tonumber(value)
+		else
+			idOfItemToSpawn = nil
+			venyx:Notify("Status","Enter valid item ID.","rbxassetid://7271796527")
+		end
+	end
+end)
+
+abilitiesSection:addButton("Spawn Item (Free)", function()
+	if idOfItemToSpawn == nil then
+		venyx:Notify("Status","Enter valid item ID.","rbxassetid://498428442")
+		return
+	end
+	if tonumber(idOfItemToSpawn) == nil then
+		venyx:Notify("Status","Enter valid item ID.","rbxassetid://498428442")
+		return
+	end
+	game:GetService("ReplicatedStorage").Remote.BuyItem:FireServer({Value = tonumber(idOfItemToSpawn),Price = {Value = 1.e-100},})
+	venyx:Notify("Status","Spawned Item!","rbxassetid://498428442")	
+end)
+
+local autoSpawnItems = false
+abilitiesSection:addToggle("Auto Spawn Item (Free)", false, function(value)
+	if value == true then
+		autoSpawnItems = true
+		venyx:Notify("Status","Auto Spawn Items enabled.","rbxassetid://498428442")
+	else
+		autoSpawnItems = false
+		venyx:Notify("Status","Auto Spawn Items disabled.","rbxassetid://498428442")
+	end
+end)
+
+abilitiesSection:addButton("Spawn All Items (Free)", function()
+	for i,v in ipairs(game:GetService("ReplicatedStorage").ItemDirectory:GetDescendants()) do
+		if v.Name == "ItemID" then
+			game:GetService("ReplicatedStorage").Remote.BuyItem:FireServer({Value = tonumber(v.Value),Price = {Value = 1.e-100},})
+		end
+	end
+	venyx:Notify("Status","Spawned All Items!","rbxassetid://10722951934")	
+end)
+
+local autoSpawnAllItems = false
+abilitiesSection:addToggle("Auto Spawn All Items (Free)", false, function(value)
+	if value == true then
+		autoSpawnAllItems = true
+		venyx:Notify("Status","Auto Spawn All Items enabled.","rbxassetid://10722951934")
+	else
+		autoSpawnAllItems = false
+		venyx:Notify("Status","Auto Spawn All Items disabled.","rbxassetid://10722951934")
+	end
+end)
+
+abilitiesSection:addButton("Launch All Fireworks In Inventory (Must Be Night)", function()
+	for i,v in ipairs(game:GetService("Players").LocalPlayer.playerstats.items:GetChildren()) do
+		task.wait()
+		game:GetService("ReplicatedStorage").Remote.LaunchFirework:FireServer(v)
+	end
+end)
+
+venyx:SelectPage(venyx.pages[1], true)
+
+task.spawn(function()
+	while task.wait() do
+		if autoChestFarm then
+			local lootFolder = game:GetService("Workspace").Mineshaft.Loot
+			if #lootFolder:GetChildren() <= 0 then
+				task.wait(2)
+				venyx:Notify("Status","No chests found.","rbxassetid://716467140")
+			end
+			for i,v in ipairs(lootFolder:GetChildren()) do
+				task.wait(0.3)
+				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v:FindFirstChildWhichIsA("BasePart",true).CFrame
+				task.wait(0.3)
+				game:GetService("ReplicatedStorage").Remote.OpenChest:FireServer(v)
+				task.wait(0.3)
+			end
+		end
+	end
+end)
+
+task.spawn(function()
+	while task.wait() do
+		if spamSpawnNPCs then
+			for i,v in ipairs(game.Players:GetChildren()) do
+				if v.Character ~= nil then
+					if v.Character:FindFirstChild("HumanoidRootPart") then
+						local args = {
+							[1] = v.Character.HumanoidRootPart.Position,
+							[2] = v.Character.HumanoidRootPart.Position,
+							[3] = v.Character.HumanoidRootPart.Position
+						}
+
+						game:GetService("ReplicatedStorage").Remote.InvokeCustomer:InvokeServer(unpack(args))
+					end
+				end
+			end
+		end
+	end
+end)
+
+task.spawn(function()
+	while task.wait() do
+		if autoSpawnItems then
+			if idOfItemToSpawn == nil then
+				task.wait(2.25)
+				venyx:Notify("Status","Enter valid item ID.","rbxassetid://498428442")
+			end
+			if tonumber(idOfItemToSpawn) == nil then
+				task.wait(2.25)
+				venyx:Notify("Status","Enter valid item ID.","rbxassetid://498428442")
+			end
+			game:GetService("ReplicatedStorage").Remote.BuyItem:FireServer({Value = tonumber(idOfItemToSpawn),Price = {Value = 1.e-100},})
+		end
+	end
+end)
+
+task.spawn(function()
+	while task.wait() do
+		if autoSpawnAllItems then
+			for i,v in ipairs(game:GetService("ReplicatedStorage").ItemDirectory:GetDescendants()) do
+				task.wait()
+				if v.Name == "ItemID" then
+					game:GetService("ReplicatedStorage").Remote.BuyItem:FireServer({Value = tonumber(v.Value),Price = {Value = 1.e-100},})
+				end
+			end
+		end
+	end
+end)
