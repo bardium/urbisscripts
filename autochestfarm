@@ -1,0 +1,9 @@
+while task.wait() do
+    for i,v in pairs(game:GetService("Workspace").Mineshaft.Loot:GetChildren()) do
+        task.wait(0.3)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v:FindFirstChildWhichIsA("BasePart",true).CFrame
+        task.wait(0.3)
+        game:GetService("ReplicatedStorage").Remote.OpenChest:FireServer(v)
+        task.wait(0.3)
+    end
+end
